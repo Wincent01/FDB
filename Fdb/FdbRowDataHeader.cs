@@ -4,6 +4,11 @@ namespace Fdb
 {
     public class FdbRowDataHeader : FdbData
     {
+        public FdbRowDataHeader()
+        {
+            
+        }
+        
         public FdbRowDataHeader(BinaryReader reader)
         {
             ColumnCount = reader.ReadUInt32();

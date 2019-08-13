@@ -7,7 +7,7 @@ namespace Fdb
         public FdbTableHeader(BinaryReader reader, FdbFile file)
         {
             ColumnHeaders = new FdbColumnHeader[file.TableCount];
-            RowTopHeaders = new FdbRowTopHeader[file.TableCount];
+            RowTopHeaders = new FdbRowBucket[file.TableCount];
 
             for (var i = 0; i < file.TableCount; i++)
             {
@@ -18,14 +18,14 @@ namespace Fdb
 
                 using (new FdbScope(reader))
                 {
-                    RowTopHeaders[i] = new FdbRowTopHeader(reader);
+                    RowTopHeaders[i] = new FdbRowBucket(reader);
                 }
             }
         }
 
         public FdbColumnHeader[] ColumnHeaders { get; set; }
 
-        public FdbRowTopHeader[] RowTopHeaders { get; set; }
+        public FdbRowBucket[] RowTopHeaders { get; set; }
 
         public override void Write(FdbFile writer)
         {

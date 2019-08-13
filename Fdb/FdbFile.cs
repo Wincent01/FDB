@@ -35,10 +35,19 @@ namespace Fdb
         {
             var fdb = new List<byte>();
             var pointers = new List<(FdbData, int)>();
+            
             foreach (var obj in Structure)
             {
-                if (obj is FdbColumnHeader header) Console.WriteLine($"Writing {header.TableName.Value} ...");
+                if (obj is FdbColumnHeader header)
+                {
+                    Console.WriteLine($"\nWriting {header.TableName.Value} ...");
+                }
 
+                if (obj is FdbRowData)
+                {
+                    Console.Write('.');
+                }
+                
                 if (obj is null)
                 {
                     fdb.AddRange(ToBytes(-1));

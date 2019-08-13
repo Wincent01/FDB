@@ -4,6 +4,11 @@ namespace Fdb
 {
     public class FdbBitInt : FdbData
     {
+        public FdbBitInt(long value)
+        {
+            Value = value;
+        }
+        
         public FdbBitInt(BinaryReader reader)
         {
             using (var s = new FdbScope(reader, true))

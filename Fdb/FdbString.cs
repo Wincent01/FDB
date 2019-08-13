@@ -5,6 +5,11 @@ namespace Fdb
 {
     public class FdbString : FdbData
     {
+        public FdbString(string value)
+        {
+            Value = value;
+        }
+        
         public FdbString(BinaryReader reader)
         {
             var builder = new StringBuilder();
@@ -27,6 +32,11 @@ namespace Fdb
         public static implicit operator string(FdbString s)
         {
             return s.Value;
+        }
+
+        public override string ToString()
+        {
+            return Value;
         }
 
         public override void Write(FdbFile writer)

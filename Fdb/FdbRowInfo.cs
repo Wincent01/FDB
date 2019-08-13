@@ -4,6 +4,11 @@ namespace Fdb
 {
     public class FdbRowInfo : FdbData
     {
+        public FdbRowInfo()
+        {
+            
+        }
+        
         public FdbRowInfo(BinaryReader reader)
         {
             using (var s = new FdbScope(reader, true))
@@ -25,10 +30,12 @@ namespace Fdb
         {
             writer.WriteObject(this);
             writer.WriteObject(DataHeader);
-            writer.WriteObject(Linked);
+            if (Linked == default)
+                writer.WriteObject(-1);
+            else
+                writer.WriteObject(Linked);
 
             DataHeader?.Write(writer);
-            ;
             Linked?.Write(writer);
         }
     }

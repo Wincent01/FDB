@@ -4,18 +4,18 @@ namespace Fdb
 {
     public class FdbRowHeader : FdbData
     {
-        public FdbRowHeader(BinaryReader reader, FdbRowTopHeader rowTopHeader)
+        public FdbRowHeader(BinaryReader reader, FdbRowBucket rowBucket)
         {
-            RowInfos = new FdbRowInfo[rowTopHeader.RowCount];
+            RowInfos = new FdbRowInfo[rowBucket.RowCount];
 
-            for (var i = 0; i < rowTopHeader.RowCount; i++)
+            for (var i = 0; i < rowBucket.RowCount; i++)
                 using (var s = new FdbScope(reader, true))
                 {
                     if (s) RowInfos[i] = new FdbRowInfo(reader);
                 }
         }
 
-        public FdbRowInfo[] RowInfos { get; set; }
+        public FdbRowInfo[] RowInfos;
 
         public override void Write(FdbFile writer)
         {

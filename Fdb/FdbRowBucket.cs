@@ -2,9 +2,9 @@ using System.IO;
 
 namespace Fdb
 {
-    public class FdbRowTopHeader : FdbData
+    public class FdbRowBucket : FdbData
     {
-        public FdbRowTopHeader(BinaryReader reader)
+        public FdbRowBucket(BinaryReader reader)
         {
             RowCount = reader.ReadUInt32();
 
@@ -14,7 +14,7 @@ namespace Fdb
             }
         }
 
-        public uint RowCount { get; set; }
+        public uint RowCount;
 
         public FdbRowHeader RowHeader { get; set; }
 

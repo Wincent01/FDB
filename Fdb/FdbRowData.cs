@@ -6,6 +6,12 @@ namespace Fdb
 {
     public class FdbRowData : FdbData
     {
+        public FdbRowData(FdbRowDataHeader header)
+        {
+            Types = new DataType[header.ColumnCount];
+            Data = new object[header.ColumnCount];
+        }
+        
         public FdbRowData(BinaryReader reader, FdbRowDataHeader header)
         {
             Types = new DataType[header.ColumnCount];
