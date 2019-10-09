@@ -38,45 +38,48 @@ namespace Fdb
             
             foreach (var obj in Structure)
             {
-                if (obj is FdbColumnHeader header)
+                switch (obj)
                 {
-                    Console.WriteLine($"\nWriting {header.TableName.Value} ...");
+                    case FdbColumnHeader header:
+                        Console.WriteLine($"\nWriting {header.TableName.Value} ...");
+                        break;
+                    case FdbRowData _:
+                        Console.Write('.');
+                        break;
                 }
 
-                if (obj is FdbRowData)
+                switch (obj)
                 {
-                    Console.Write('.');
-                }
-                
-                if (obj is null)
-                {
-                    fdb.AddRange(ToBytes(-1));
-                }
-                else if (obj is FdbData data)
-                {
-                    var pointer = pointers.Where(p => p.Item1 == data).ToArray();
-                    if (pointer.Any())
+                    case null:
+                        fdb.AddRange(ToBytes(-1));
+                        break;
+                    case FdbData data:
                     {
-                        var bytes = ToBytes(fdb.Count);
-
-                        foreach (var tuple in pointer)
+                        var pointer = pointers.Where(p => p.Item1 == data).ToArray();
+                        if (pointer.Any())
                         {
-                            pointers.Remove(tuple);
-                            for (var j = 0; j < 4; j++) fdb[tuple.Item2 + j] = bytes[j];
-                        }
-                    }
-                    else
-                    {
-                        // Save pointers for last
-                        pointers.Add((data, fdb.Count));
+                            var bytes = ToBytes(fdb.Count);
 
-                        // Reserve space for pointer
-                        fdb.AddRange(new byte[4]);
+                            foreach (var tuple in pointer)
+                            {
+                                pointers.Remove(tuple);
+                                for (var j = 0; j < 4; j++) fdb[tuple.Item2 + j] = bytes[j];
+                            }
+                        }
+                        else
+                        {
+                            // Save pointers for last
+                            pointers.Add((data, fdb.Count));
+
+                            // Reserve space for pointer
+                            fdb.AddRange(new byte[4]);
+                        }
+
+                        break;
                     }
-                }
-                else
-                {
-                    fdb.AddRange(ToBytes(obj));
+                    default:
+                        fdb.AddRange(ToBytes(obj));
+                        break;
                 }
             }
 

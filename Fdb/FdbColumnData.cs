@@ -5,6 +5,11 @@ namespace Fdb
 {
     public class FdbColumnData : FdbData
     {
+        public FdbColumnData()
+        {
+            
+        }
+            
         public FdbColumnData(BinaryReader reader, FdbColumnHeader header)
         {
             Type = new DataType[header.ColumnCount];

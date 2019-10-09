@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Fdb.Enums;
 
 namespace Fdb
@@ -9,7 +11,7 @@ namespace Fdb
     {
         private static void Main(string[] args)
         {
-            var path = "";
+            string path;
 
             if (args.Length >= 1)
             {
@@ -36,6 +38,8 @@ namespace Fdb
             var bytes = fdb.Complete();
 
             File.WriteAllBytes(output, bytes);
+            
+            Console.WriteLine("Complete!");
         }
 
         private static void Edit(FdbFile file)
@@ -57,7 +61,7 @@ namespace Fdb
                     }
                 }
 
-                Console.WriteLine("<up>/<down>/<index>/<save>");
+                Console.WriteLine("<up>/<down>/<index>/<save>/<create>");
                 
                 var input = Console.ReadLine();
                 
@@ -75,6 +79,9 @@ namespace Fdb
                         continue;
                     case "save":
                         return;
+                    case "create":
+                        AddTable(file);
+                        break;
                     default:
                         if (int.TryParse(input, out var selected))
                         {
@@ -95,6 +102,81 @@ namespace Fdb
                         break;
                 }
             }
+        }
+
+        private static void AddTable(FdbFile file)
+        {
+            Console.Write("New Table Name: ");
+            var tableName = Console.ReadLine();
+
+            var tableInfo = new List<(string, DataType)>();
+
+            int columnIndex = default;
+            while (true)
+            {
+                Console.Write($"[{columnIndex}] Column Name: ");
+                var columnName = Console.ReadLine();
+
+                while (true)
+                {
+                    Console.Write($"[{columnIndex}] Column Type: ");
+                    
+                    if (Enum.TryParse(typeof(DataType), Console.ReadLine(), out var newType))
+                    {
+                        var data = (DataType) newType;
+                        
+                        tableInfo.Add((columnName, data));
+                        
+                        break;
+                    }
+
+                    Console.WriteLine("Invalid type");
+                }
+
+                Console.Write("Another column? <y>/<>");
+
+                switch (Console.ReadLine()?.ToLower())
+                {
+                    case "y":
+                        columnIndex++;
+                        continue;
+                    default:
+                        goto Finish;
+                }
+            }
+            
+            Finish:
+
+            file.TableCount++;
+
+            var columnHeader = file.TableHeader.ColumnHeaders.ToList();
+            var rowsHeader = file.TableHeader.RowTopHeaders.ToList();
+
+            var header = new FdbColumnHeader
+            {
+                ColumnCount = (uint) tableInfo.Count,
+                TableName = new FdbString(tableName),
+                Data = new FdbColumnData
+                {
+                    ColumnName = tableInfo.Select(s => new FdbString(s.Item1)).ToArray(),
+                    Type = tableInfo.Select(s => s.Item2).ToArray()
+                }
+            };
+            
+            var rowHeader = new FdbRowBucket
+            {
+                RowCount = 128,
+                RowHeader = new FdbRowHeader
+                {
+                    RowInfos = Enumerable.Repeat<FdbRowInfo>(null, 128).ToArray()
+                }
+            };
+
+            columnHeader.Add(header);
+            rowsHeader.Add(rowHeader);
+
+            file.TableHeader.ColumnHeaders = columnHeader.ToArray();
+            file.TableHeader.RowTopHeaders = rowsHeader.ToArray();
         }
 
         private static void EditTable((FdbColumnHeader, FdbRowBucket) table)

@@ -4,6 +4,8 @@ namespace Fdb
 {
     public class FdbRowHeader : FdbData
     {
+        public FdbRowHeader(){}
+        
         public FdbRowHeader(BinaryReader reader, FdbRowBucket rowBucket)
         {
             RowInfos = new FdbRowInfo[rowBucket.RowCount];

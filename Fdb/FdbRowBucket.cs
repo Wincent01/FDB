@@ -4,6 +4,8 @@ namespace Fdb
 {
     public class FdbRowBucket : FdbData
     {
+        public FdbRowBucket(){}
+        
         public FdbRowBucket(BinaryReader reader)
         {
             RowCount = reader.ReadUInt32();
